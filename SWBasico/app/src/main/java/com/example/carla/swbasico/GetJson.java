@@ -1,6 +1,8 @@
 package com.example.carla.swbasico;
 
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,6 +27,7 @@ public class GetJson extends AsyncTask<Void,Void,Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         try {
+
             URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=Tepic,mx&APPID=2b05b51c405c3834f1a66d2765eacc38");
             HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
             InputStream inputStream = httpURLConnection.getInputStream();
@@ -32,17 +35,16 @@ public class GetJson extends AsyncTask<Void,Void,Void> {
             String line = "";
             while(line != null){
                 line = bufferedReader.readLine();
-                data = data + line;
+                data += line;
             }
-            JSONArray JA = new JSONArray(data);
-            for(int i =0 ;i <JA.length(); i++){
-                JSONObject JO = (JSONObject) JA.get(i);
-                singleParsed = "Name:" + JO.get("name") + "\n"+
-                        "Password:" + JO.get("psw") + "\n"+
-                        "Contact:" + JO.get("cel") + "\n"+
-                        "Country:" + JO.get("pais") + "\n";
-                dataParsed = dataParsed + singleParsed +"\n" ;
-            }
+            JSONObject JOMain = new JSONObject(data);
+            JSONObject JO = new JSONObject(JOMain.get("main").toString());
+
+            Log.e("HTTP",JO.toString());
+            singleParsed = "Temperatura:" + JO.get("temp") + "\n"+
+                    "Humedad:" + JO.get("humidity") + "\n";
+            dataParsed = dataParsed + singleParsed +"\n" ;
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -55,6 +57,6 @@ public class GetJson extends AsyncTask<Void,Void,Void> {
     @Override
     protected void onPostExecute(Void aVoid) {
         super.onPostExecute(aVoid);
-        MainActivity.data.setText(this.dataParsed);
+        MainActivity.data.setText("Tiempo:\n"+this.dataParsed);
     }
 }
